@@ -30,23 +30,22 @@ namespace notesAPI.Controllers
             }
 
         };
-        
-        /* [HttpGet]
-         public IActionResult GetCategory()
-         {
-             return Ok(categories);
-         }*/
+
+        [HttpGet]
+        public IActionResult GetCategory()
+        {
+            return Ok(categories);
+        }
 
         /// <summary>
-        /// Get one random category
+        /// Get one category with a certain ID
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public IActionResult GetOne()
+        [HttpGet("{id}")]
+        public IActionResult GetOne(int id)
         {
-            Random rnd = new Random();
-            int index = rnd.Next(0, 3);
-            return Ok(categories[index]);
+            
+            return Ok(categories.Where(n => n.Id == id));
         }
 
         /// <summary>
@@ -65,6 +64,7 @@ namespace notesAPI.Controllers
             }
             return Ok(categ);
         }
+
         [HttpDelete("id")]
         public IActionResult DeleteCategory(int id)
          {

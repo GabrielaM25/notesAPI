@@ -32,17 +32,28 @@ namespace notesAPI.Controllers
         {
             return Ok(_notes);
         }
+        /// <summary>
+        /// Creates a new note
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult CreateNote([FromBody]Note note)
         {
-            _notes.Add(note);
+            
             if (note == null)
             {
-                return BadRequest("Note cannot be null");
+                return BadRequest("Note should not be null");
             }
+            _notes.Add(note);
             return Ok(_notes);
         }
 
+
+        /// <summary>
+        /// Updates the note with a certain ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public IActionResult UpdateNote(Guid id ,[FromBody] Note note)
         {
@@ -52,7 +63,8 @@ namespace notesAPI.Controllers
             }
             int index = _notes.FindIndex(n => n.Id == id);
             if (index == -1)
-            {///daca u=nu exista notita pt editat o creeaza 
+            {
+               /* daca u=nu exista notita pt editat o creeaza */
                 return CreateNote(note);
                
             }
@@ -61,6 +73,11 @@ namespace notesAPI.Controllers
             return Ok(_notes);
         }
 
+        /// <summary>
+        /// Deletes the note with that certain ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public IActionResult DeleteNote(Guid id)
         {
@@ -78,7 +95,28 @@ namespace notesAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all notes of a certain owner
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        [HttpGet("owner:{id}")]
+        public IActionResult GetNotesByOwner(Guid id)
+        {
+            return Ok(_notes.Where(n => n.OwnerId == id));
+        }
 
+        /// <summary>
+        /// Get all notes with a certain ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public IActionResult GetNotesID(Guid id)
+        {
+            return Ok(_notes.Where(note => note.Id == id));
 
+        }
     }
 }

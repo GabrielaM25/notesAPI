@@ -10,6 +10,6 @@ namespace notesAPI.Models
 
         public string Name { get; set; }
 
-        public string Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

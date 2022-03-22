@@ -36,10 +36,10 @@ namespace notesAPI.Controllers
         {
             return Ok(categories);
         }
-
         /// <summary>
         /// Get one category with a certain ID
         /// </summary>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult GetOne(int id)
@@ -64,7 +64,11 @@ namespace notesAPI.Controllers
             }
             return Ok(categ);
         }
-
+       /// <summary>
+       /// Delete category
+       /// </summary>
+       /// <param name="id"></param>
+       /// <returns></returns>
         [HttpDelete("id")]
         public IActionResult DeleteCategory(int id)
          {

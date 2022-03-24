@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using notesAPI.Models;
+using notesAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,32 @@ namespace notesAPI.Controllers
     [ApiController]
     public class OwnerController : ControllerBase
     {
-        private static List<Owner> _owners = new List<Owner>{
-            new Owner{Name = "Clive Owen" , Id = Guid.NewGuid()},
-            new Owner{Name = "Natalie Portman" , Id = Guid.NewGuid()},
-            new Owner{Name = "Mila Kunis" , Id = Guid.NewGuid()},
-       };
+        IOwnerCollectionService _ownerCollectionService;
+        public OwnerController(IOwnerCollectionService ownerCollectionsService)
+        {
+            _ownerCollectionService = ownerCollectionsService ?? throw new ArgumentNullException(nameof(ownerCollectionsService));
+        }   
+        
         /// <summary>
         /// Get owners
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult GetOwners()
+        public async Task<IActionResult> GetOwners()
         {
-            return Ok(_owners);
+            List<Owner> owners = await _ownerCollectionService.GetAll();
+            return Ok(owners);
+        }
+       /* public IActionResult GetOwners()
+        {
+            return Ok(_ownerCollectionService.GetAll());
+        }*/
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOwnersById(Guid id)
+        {
+            return Ok(await _ownerCollectionService.Get(id));
         }
         /// <summary>
         /// 
@@ -32,10 +46,14 @@ namespace notesAPI.Controllers
         /// <param name="owner"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddOwners([FromBody] Owner owner)
+        public async Task<IActionResult> AddOwners([FromBody] Owner owner)
         {
-            _owners.Add(owner);
-            return Ok(_owners);
+            if (owner == null)
+            {
+                return BadRequest("Owner should not be null");
+            }
+            await _ownerCollectionService.Create(owner);
+            return Ok(await _ownerCollectionService.GetAll());
         }
 
         /// <summary>
@@ -44,24 +62,20 @@ namespace notesAPI.Controllers
         /// <param name="id"></param>
         /// <param name="owner"></param>
         /// <returns></returns>
-        [HttpPut]
-        public IActionResult UpdateOwner(Guid id, [FromBody] Owner owner)
+        [HttpPut("{id}")]
+        public  async Task<IActionResult> UpdateOwner(Guid id, [FromBody] Owner owner)
         {
             if (owner == null)
             {
                 return BadRequest("Owner can't be null");
             }
-            int index = _owners.FindIndex(n => n.Id == id);
-            if (index == -1)
+            if (!await _ownerCollectionService.Update(id, owner))
             {
 
-                return NotFound("Owner not found");
-
+                return NotFound("This owner doesn't exist");
             }
-            owner.Id = id;
-            _owners[index] = owner;
+                return Ok(await _ownerCollectionService.Get(id));
 
-            return Ok(_owners);
         }
         /// <summary>
         /// Delete the owner with that certain ID
@@ -69,17 +83,19 @@ namespace notesAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult DeleteOwner(Guid id) {
-            int index = _owners.FindIndex(n => n.Id == id);
-            if (index == -1)
+        public async Task<IActionResult> DeleteOwner(Guid id)
+        {
+
+            if ( await _ownerCollectionService.Delete(id))
             {
 
-                return NotFound("Owner not found");
+                return Ok("Owner was deleted");
 
             }
-            /*suprascrie lista cu o lista fara ownerul sters*/
-            _owners = _owners.Where(n => n.Id == id).ToList();
-            return Ok(_owners);
+            else
+            {
+                return NotFound("this owner doesn't exist");
+            }
         }
     }
 }

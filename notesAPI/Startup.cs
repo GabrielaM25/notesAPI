@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using notesAPI.Services;
+using notesAPI.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +30,10 @@ namespace notesAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MongoDBSettings>(Configuration.GetSection(nameof(MongoDBSettings)));
+            services.AddSingleton<IMongoDBSettings>(sp => sp.GetRequiredService<IOptions<MongoDBSettings>>().Value);
+            
+
             services.AddSwaggerGen((c) =>
             {
 
@@ -35,7 +42,20 @@ namespace notesAPI
                 c.IncludeXmlComments(xmlPath);
 
             });
+            services.AddCors(options =>
+            {
+            options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod());
+                
+                                      
+            });
             services.AddControllers();
+            services.AddSingleton<INoteCollectionService, NoteCollectionService>();
+            services.AddSingleton<IOwnerCollectionService, OwnerCollectionService>();
+           
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +78,8 @@ namespace notesAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 

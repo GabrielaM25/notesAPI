@@ -133,13 +133,13 @@ namespace notesAPI.Services
 
 
          }*/
-        public async Task<bool> Update(Guid id, Note note)
+        public async Task<bool> Update(Guid id, Note noteNew)
         {
-            note.Id = id;
-            var result = await _notes.ReplaceOneAsync(note => note.Id == id, note);
+            noteNew.Id = id;
+            var result = await _notes.ReplaceOneAsync(note => note.Id == id, noteNew);
             if (!result.IsAcknowledged && result.ModifiedCount == 0)
             {
-                await _notes.InsertOneAsync(note);
+                await _notes.InsertOneAsync(noteNew);
                 return false;
             }
 

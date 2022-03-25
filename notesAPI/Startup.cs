@@ -77,9 +77,9 @@ namespace notesAPI
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             app.UseCors("CorsPolicy");
+
+            app.UseRouting();
 
             app.UseAuthorization();
 

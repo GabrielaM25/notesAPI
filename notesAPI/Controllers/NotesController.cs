@@ -121,7 +121,7 @@ namespace notesAPI.Controllers
         {
             if (await _noteCollectionService.Delete(id))
             {
-                return Ok("note deleted");
+                return Ok(await _noteCollectionService.GetAll());
             }
             else
             {
@@ -157,10 +157,11 @@ namespace notesAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}", Name = "GetNote")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetNotesID(Guid id)
         {
-            return Ok(await _noteCollectionService.Get(id));
+           Note note = await _noteCollectionService.Get(id);
+            return Ok(note);
         }
 
         /*public IActionResult GetNotesID(Guid id)

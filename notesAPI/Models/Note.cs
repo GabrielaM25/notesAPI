@@ -16,7 +16,7 @@ namespace notesAPI.Models
 
         [Required] public  Guid Id { get; set; }
 
-        [Required(ErrorMessage ="owner id is missing")] public  Guid OwnerId { get; set; }
+        public  Guid OwnerId { get; set; }
 
 
 
